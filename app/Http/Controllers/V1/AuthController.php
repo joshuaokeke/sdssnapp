@@ -161,7 +161,8 @@ class AuthController extends Controller
 
         // Update password
         $auth = Auth::user()->update([
-            'password' => $data['new_password'],
+            // 'password' => $data['new_password'],
+            'password' => Hash::make($request->new_password),
         ]);
         if (!$auth) {
             return response()->json([
@@ -216,7 +217,7 @@ class AuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Check your email inbox for a OTP to setup your new password.',
+            'message' => 'Check your email inbox for an OTP to setup your new password.',
         ]);
     }
 
@@ -259,10 +260,21 @@ class AuthController extends Controller
             ]);
         }
         $user->update(['password' => Hash::make($request->password)]);
-
+        // Update password
+        $auth = $user->update([
+            'password' => Hash::make($request->password),
+        ]);
+        if (!$auth) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Password reset failed.',
+            ]);
+        }
+        DB::commit();
         return response()->json([
             'success' => true,
-            'message' => 'Password setup successful.',
+            'message' => 'Password reset successful.',
         ]);
     }
 

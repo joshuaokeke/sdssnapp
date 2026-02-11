@@ -85,7 +85,7 @@ class OtpTokenService
             ->first();
 
         if (!$theToken || !Hash::check($otp, $theToken['token'])) {
-            return true;
+            return false;
         }
         $theToken->delete();
         return true;
