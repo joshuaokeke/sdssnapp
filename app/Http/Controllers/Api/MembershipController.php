@@ -15,9 +15,37 @@ class MembershipController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $memberships = Membership::with(['user'])->latest()->paginate();
+        $memberships = Membership::with(['user']);
+        if ($request->filled('search') && $request->input('search')) {
+            $memberships = $memberships->whereAny([
+                'user_id',
+                'full_name',
+                'certification_request_id',
+                'issued_on',
+                'expires_on',
+                'serial_no',
+                'qr_code',
+            ],  'like', '%' . $request->input('search') . '%');
+        }
+        // Pending or Paid
+        if ($request->filled('status') && $request->input('status')) {
+            $memberships = $memberships->where('status', $request->input('status'));
+        }
+        // Pending or Generated
+        if ($request->filled('certificate_status') && $request->input('certificate_status')) {
+            $memberships = $memberships->where('certificate_status', $request->input('certificate_status'));
+        }
+        // Issued on - start date
+        if ($request->filled('issued_on') && $request->input('issued_on')) {
+            $memberships = $memberships->where('issued_on', $request->input('issued_on'));
+        }
+        // Expires on - end date
+        if ($request->filled('expires_on') && $request->input('expires_on')) {
+            $memberships = $memberships->where('expires_on', $request->input('expires_on'));
+        }
+        $memberships = $memberships->latest()->paginate();
 
         // Check if there are any memberships
         if ($memberships->isEmpty()) {
@@ -187,9 +215,10 @@ class MembershipController extends Controller
         // 'user', 'userSignature', 'credential', 'certification', 'membership'
         // $membership->load(['certificationRequest.certification.managementSignature.signature', 'certificationRequest.userSignature', 'certificationRequest.credential', 'user']);
         $membership->load([
-            'certificationRequest.certification.managementSignature.signature', 
-            'certificationRequest.certification.secretarySignature.signature',  
-            'certificationRequest.credential', 'user'
+            'certificationRequest.certification.managementSignature.signature',
+            'certificationRequest.certification.secretarySignature.signature',
+            'certificationRequest.credential',
+            'user'
         ]);
 
         // Transform the membership into a resource
