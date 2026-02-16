@@ -22,6 +22,7 @@ class DonationPaymentController extends Controller
         $donationPayments = DonationPayment::with(['donation']);
         // Search
         if ($request->filled('search') && $request->input('search')) {
+            $search = $request->input('search');
             // Search through donation payments
             $donationPayments = $donationPayments->whereAny([
                 'user_id',
@@ -32,9 +33,8 @@ class DonationPaymentController extends Controller
                 'reference',
                 'status',
                 'data',
-            ],  'like', '%' . $request->input('search') . '%');
+            ],  'like', '%' . $search . '%');
             // Search through the donation
-            $search = $request->input('search');
             $donationPayments = $donationPayments->whereHas('donation', function ($query) use ($search) {
                 $query->whereAny([
                     'user_id',
@@ -58,7 +58,7 @@ class DonationPaymentController extends Controller
         if ($request->filled('created_at') && $request->input('created_at')) {
             $donationPayments = $donationPayments->where('created_at', $request->input('created_at'));
         }
-        $donationPayments->latest()->paginate();
+        $donationPayments = $donationPayments->latest()->paginate();
 
         // Check if there are any donation payments
         if ($donationPayments->isEmpty()) {
