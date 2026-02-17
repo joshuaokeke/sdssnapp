@@ -212,10 +212,45 @@ class AdminController extends Controller
     /**
      * Display and paginate users.
      */
-    public function users()
+    public function users(Request $request)
     {
 
-        $users = User::paginate();
+        $users = User::query();
+        if ($request->filled('search') && $request->has('search')) {
+            $users->whereAny([
+                'name',
+                'email',
+                'password',
+                'first_name',
+                'last_name',
+                'other_name',
+                'security_question',
+                'answer',
+                'phone_number',
+                'gender',
+                'dob',
+                'address',
+                'city',
+                'state',
+                'country',
+                'membership_status',
+                'role',             // ['user', 'moderator', 'admin', 'super-admin']
+                'assigned_by',
+
+                'email_verified',
+                'email_verified_at',
+
+                'profession',
+                'organization',
+                'organization_category',
+                'organization_role',
+                'organization_name',
+                'asset_id',
+                'qualification',
+                'course'
+            ], 'like', "%{$request?->search}%");
+        }
+        $users = $users->paginate();
         $metadata = $this->getMetadata($users);
 
         if (!$users) {
