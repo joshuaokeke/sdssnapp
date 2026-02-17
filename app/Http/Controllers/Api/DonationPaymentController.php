@@ -17,9 +17,48 @@ class DonationPaymentController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $donationPayments = DonationPayment::with(['donation'])->latest()->paginate();
+        $donationPayments = DonationPayment::with(['donation']);
+        // Search
+        if ($request->filled('search') && $request->input('search')) {
+            $search = $request->input('search');
+            // Search through donation payments
+            $donationPayments = $donationPayments->whereAny([
+                'user_id',
+                'donation_id',
+                'payment_type', // [donation]
+                'payment_method',
+                'amount',
+                'reference',
+                'status',
+                'data',
+            ],  'like', '%' . $search . '%');
+            // Search through the donation
+            $donationPayments = $donationPayments->whereHas('donation', function ($query) use ($search) {
+                $query->whereAny([
+                    'user_id',
+                    'full_name',
+                    'email',
+                    'amount',
+                    'reason_for_donation',
+                    'note',
+                    'status',
+                    'created_by',
+                    'updated_by',
+                    'deleted_by',
+                ],  'like', '%' . $search . '%');
+            });
+        }
+        // Pending or Paid
+        if ($request->filled('status') && $request->input('status')) {
+            $donationPayments = $donationPayments->where('status', $request->input('status'));
+        }
+        // Created at
+        if ($request->filled('created_at') && $request->input('created_at')) {
+            $donationPayments = $donationPayments->where('created_at', $request->input('created_at'));
+        }
+        $donationPayments = $donationPayments->latest()->paginate();
 
         // Check if there are any donation payments
         if ($donationPayments->isEmpty()) {

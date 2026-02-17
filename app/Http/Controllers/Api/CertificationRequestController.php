@@ -16,6 +16,7 @@ use App\Models\Api\Membership;
 use App\Models\Assets;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon as SupportCarbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -25,11 +26,37 @@ class CertificationRequestController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         // $certificationRequests = CertificationRequest::with(['user'])->get();
-        $certificationRequests = CertificationRequest::with(['certification', 'user'])
-            ->latest()->paginate();
+        $certificationRequests = CertificationRequest::with(['certification', 'user']);
+        if ($request->filled('search') && $request->input('search')) {
+            $certificationRequests = $certificationRequests->whereAny([
+                'user_id',
+                'certification_id',
+                'full_name',
+                // 'user_signature_id',
+                'reason_for_certification',
+                'management_note',
+                'credential_id',
+                'status',
+                'created_by',
+                'approved_by',
+                'rejected_by',
+            ],  'like', '%' . $request->input('search') . '%');
+        }
+        // Pending or Paid
+        if ($request->filled('status') && $request->input('status')) {
+            $certificationRequests = $certificationRequests->where('status', $request->input('status'));
+        }
+        // Pending or Paid
+        if ($request->filled('type') && $request->input('type')) {
+            $type = $request->input('type');
+            $certificationRequests = $certificationRequests->whereHas('certification', function ($query) use ($type) {
+                $query->where('type', $type);
+            });
+        }
+        $certificationRequests = $certificationRequests->latest()->paginate();
 
         // Check if there are any certification requests
         if ($certificationRequests->isEmpty()) {
