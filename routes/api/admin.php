@@ -20,6 +20,7 @@ use App\Http\Controllers\CredentialController;
 use App\Http\Controllers\ManagementSignatureController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\OurPartnerController;
+use App\Http\Controllers\UpcomingEventController;
 use App\Models\User;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
@@ -177,6 +178,11 @@ Route::prefix('admin')
             Route::get('/setup-premium-users', [AdminController::class, 'setupPremiumUsers']);
             // Set up premium user by email
             Route::post('/setup-test-premium-user', [AdminController::class, 'setupTestPremiumUsers']);
+
+
+            // Upcoming events
+            Route::apiResource('/upcoming-events', UpcomingEventController::class);
+            Route::post('/upcoming-events/{upcomingEvent}/banner', [UpcomingEventController::class, 'updateBanner']);
         }
     );
 

@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\UserProfile;
 use App\Http\Controllers\Api\UserSocial;
 use App\Http\Controllers\CertificationController;
 use App\Http\Controllers\NewsletterController;
+use App\Http\Controllers\UpcomingEventController;
 use App\Models\Api\CertificationRequest;
 use App\Models\Api\Membership;
 use App\Models\Certification;
@@ -306,6 +307,13 @@ Route::get('donations/verify', [DonationPaymentController::class, 'verifyDonatio
 
 // Membership statistical routes
 Route::get('/memberships', [AdminController::class, 'memberships']);
+
+
+// Upcoming events
+Route::get('/upcoming-events', [UpcomingEventController::class, 'upcoming']);
+Route::get('/recent-events', [UpcomingEventController::class, 'recent']);
+
+
 
 // Admin Routes
 require  __DIR__ . "/api/admin.php";
