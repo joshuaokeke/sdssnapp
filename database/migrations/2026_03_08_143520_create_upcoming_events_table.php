@@ -25,7 +25,7 @@ return new class extends Migration
             $table->date('end_date')->nullable();
             $table->time('end_time')->nullable();
             $table->string('category')->nullable()->default('general'); // Category of e.g., 'general', 'retreat', 'seminar'
-            $table->boolean('status')->default(1);
+            $table->string('status')->default('draft'); // draft, published
             $table->json('facilitators')->nullable();
             $table->json('speakers')->nullable();
             $table->string('contact_name')->nullable();

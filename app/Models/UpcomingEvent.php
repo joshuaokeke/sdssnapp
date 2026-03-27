@@ -3,6 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Carbon\Carbon;
+
 
 class UpcomingEvent extends Model
 {
@@ -20,7 +23,7 @@ class UpcomingEvent extends Model
         'end_time',
         'end_date',
         'category',
-        'status',
+        'status', // draft, published
         'facilitators',
         'speakers',
         'contact_name',
@@ -32,11 +35,44 @@ class UpcomingEvent extends Model
 
     // casts
     protected $casts = [
-        'status' => 'boolean',
         'speakers' => 'array',
         'facilitators' => 'array',
+        'start_date' => 'date:Y-m-d',
+        'end_date' => 'date:Y-m-d',
     ];
 
+
+    protected function startTime(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value) => $value ? Carbon::parse($value)->format('H:i') : null,
+            set: fn($value) => $value ? Carbon::parse($value)->format('H:i:s') : null,
+        );
+    }
+
+    protected function startDate(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value) => $value ? Carbon::parse($value)->format('Y-m-d') : null,
+            set: fn($value) => $value ? Carbon::parse($value)->format('Y-m-d') : null,
+        );
+    }
+
+    protected function endTime(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value) => $value ? Carbon::parse($value)->format('H:i') : null,
+            set: fn($value) => $value ? Carbon::parse($value)->format('H:i:s') : null,
+        );
+    }
+
+    protected function endDate(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value) => $value ? Carbon::parse($value)->format('Y-m-d') : null,
+            set: fn($value) => $value ? Carbon::parse($value)->format('Y-m-d') : null,
+        );
+    }
     // banner
     public function banner()
     {

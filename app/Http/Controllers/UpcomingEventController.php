@@ -26,12 +26,12 @@ class UpcomingEventController extends Controller
     }
 
     /**
-     * Public - Display a listing of all active upcoming events.
+     * Public - Display a listing of all upcoming events (upcoming active events).
      */
     public function upcoming()
     {
         $upcomingEvents = UpcomingEvent::with('banner')
-            ->where('status', 'true')
+            ->where('status', 'published')
             ->latest()
             ->paginate();
         if ($upcomingEvents->isEmpty()) {
@@ -42,12 +42,13 @@ class UpcomingEventController extends Controller
     }
 
     /**
-     * Public - Display a listing of all recent events.
+     * Public - Display a listing of all recent events (past inactive events).
      */
     public function recent()
     {
         $upcomingEvents = UpcomingEvent::with('banner')
-            ->whereNot('status', 'true')
+            ->where('status', 'recent')
+            ->orWhere('start_date', '<=', now())
             ->latest()
             ->paginate();
         if ($upcomingEvents->isEmpty()) {
