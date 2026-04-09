@@ -26,6 +26,7 @@ class StoreConversationRequest extends FormRequest
             'subject' => ['required', 'string'],
             'message' => ['required', 'string'],
             'reason' => ['nullable'],
+            'sent_to' => ['required', 'array'],
             'sent_to.*' => ['nullable', 'exists:users,id']
         ];
     }

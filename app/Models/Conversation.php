@@ -4,11 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Log;
 
 class Conversation extends Model
 {
     use SoftDeletes;
-    
+
     protected $fillable = [
         'sent_by',
         'sent_to',
@@ -31,6 +32,8 @@ class Conversation extends Model
     public function sentTo()
     {
         $userIds = $this->sent_to;
-        return User::whereId($userIds)->get();
+        $sentToUsers = User::whereIn('id', $userIds)->get();
+        Log::info('Conversation - Sent To Users: ', [$sentToUsers]);
+        return $sentToUsers;
     }
 }

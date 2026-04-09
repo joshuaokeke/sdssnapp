@@ -22,7 +22,7 @@ class UpcomingEventController extends Controller
             return ApiResponse::error([], 'No upcoming events found', 404);
         }
         $data = UpcomingEventResource::collection($upcomingEvents);
-        return ApiResponse::success($data, 'successful');
+        return ApiResponse::success($data, 'successful', 200, $upcomingEvents);
     }
 
     /**
@@ -32,30 +32,34 @@ class UpcomingEventController extends Controller
     {
         $upcomingEvents = UpcomingEvent::with('banner')
             ->where('status', 'published')
+            // start date is greater than or equal to today
+            ->where('start_date', '>=', now()->subDays(3)->toDateString())
             ->latest()
             ->paginate();
         if ($upcomingEvents->isEmpty()) {
             return ApiResponse::error([], 'No upcoming events found', 404);
         }
         $data = UpcomingEventResource::collection($upcomingEvents);
-        return ApiResponse::success($data, 'successful');
+        return ApiResponse::success($data, 'successful', 200, $upcomingEvents);
     }
 
     /**
-     * Public - Display a listing of all recent events (past inactive events).
+     * Public - Display a listing of all recent/closed events (past inactive events).
      */
     public function recent()
     {
         $upcomingEvents = UpcomingEvent::with('banner')
-            ->where('status', 'recent')
-            ->orWhere('start_date', '<=', now())
+            ->where('status', 'closed')
+            ->orWhere('status', 'recent')
+            // start date is less than today
+            ->where('start_date', '<', now()->toDateString())
             ->latest()
             ->paginate();
         if ($upcomingEvents->isEmpty()) {
             return ApiResponse::error([], 'No recent events found', 404);
         }
         $data = UpcomingEventResource::collection($upcomingEvents);
-        return ApiResponse::success($data, 'successful');
+        return ApiResponse::success($data, 'successful', 200, $upcomingEvents);
     }
 
     /**

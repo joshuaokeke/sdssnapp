@@ -16,14 +16,18 @@ class UpcomingEvent extends Model
         'banner_id',
         'title', // name on the resources
         'description', // description
-        'venue',
-        'registration_link',
+
+        'category', // e.g., 'general', 'retreat', 'seminar'
+        'venue', // e.g., 'address', 'zoom', 'youtube'
+        'registration_link', // e.g., 'google meet', 'zoom', 'youtube'
+        'location', // e.g., 'address', 'zoom', 'youtube'
+
         'start_time',
         'start_date',
         'end_time',
         'end_date',
         'category',
-        'status', // draft, published
+        'status', // draft, published, closed
         'facilitators',
         'speakers',
         'contact_name',

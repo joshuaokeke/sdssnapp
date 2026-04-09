@@ -32,8 +32,14 @@ class UpdateUpcomingEventRequest extends FormRequest
             'end_date' => ['nullable', 'date'],
             // 'status' => ['nullable', 'in:true,false'],
             // 'status' => ['nullable', 'in:1,0'],
+
+            'category' => ['nullable', 'string'],
+            'registration_link' => ['nullable', 'url'],
+            'venue' => ['nullable', 'string'],
+            'location' => ['nullable', 'string'],
+
             // // draft, published
-            'status' => ['nullable', 'in:draft,recent,published'],
+            'status' => ['nullable', 'in:draft,published,closed'],
             'contact_name' => ['nullable', 'string'],
             'contact_phone_number' => ['nullable', 'string'],
             'speakers' => ['nullable', 'array'],
@@ -48,7 +54,7 @@ class UpdateUpcomingEventRequest extends FormRequest
     protected function prepareForValidation()
     {
         $this->merge([
-            'start_date' => $this->start_date ? Carbon::createFromFormat('d-m-Y', $this->start_date)->format('Y-m-d') : null,
+            'start_date' => $this->start_date ? Carbon::createFromFormat('Y-m-d', $this->start_date)->format('Y-m-d') : null,
             'start_time' => $this->start_time ? Carbon::parse($this->start_time)->format('H:i') : null,
         ]);
     }
